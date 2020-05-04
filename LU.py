@@ -24,3 +24,8 @@ for row in range(0, imgRaster.shape[0]):
                 break
 
 plt.imshow(classifiedRaster)
+
+rangeMatrix = np.tile(0, (8, 17, 17))
+for i in range(0, 8):
+    rangeMatrix[i, 8 - i - 1 : 8 + i + 2, 8 - i - 1 : 8 + i + 2] = 1
+    rangeMatrix[i, 8 - i : 8 + i + 1, 8 - i : 8 + i + 1] = 0
