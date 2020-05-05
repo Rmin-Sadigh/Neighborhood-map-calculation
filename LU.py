@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from tqdm import trange
 import os
@@ -27,8 +26,6 @@ for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image", unit=" 
             if np.array_equal(imgRaster[row][col], color):
                 classifiedRaster[row][col] = id
                 break
-
-plt.imshow(classifiedRaster)
 
 rangeMatrix = np.tile(0, (8, 17, 17))
 for i in range(0, 8):
@@ -80,6 +77,8 @@ for i in range(0, 6):
                 sumMatrix[i] += IKDLRes[row, col, :, :]
     sumMatrix[i] /= cellCount
 
+if not os.path.exists("data/outputs"):
+    os.makedirs("data/outputs")
 for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
     for k in range(0, 8):
         fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
@@ -89,3 +88,5 @@ for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
         ax.plot(range(1, 9), sumMatrix[l, k, :])
         fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
         plt.close(fig)
+
+print("Output figures are saved in data/outputs directory")
