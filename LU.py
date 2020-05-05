@@ -21,7 +21,7 @@ imgRaster = np.asarray(img)
 classifiedRaster = np.tile(0, (img.height, img.width))
 img.close()
 
-for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image"):
+for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image", unit=" rows"):
     for col in range(0, imgRaster.shape[1]):
         for id, color in RgbCodes.items():
             if np.array_equal(imgRaster[row][col], color):
@@ -43,7 +43,9 @@ for i in range(0, 8):
 
 IKDLRes = np.zeros((classifiedRaster.shape[0], classifiedRaster.shape[1], 8, 8))
 lCells = classifiedRaster != 0
-for row in trange(0, classifiedRaster.shape[0], desc="Calculating IKDL matrixes"):
+for row in trange(
+    0, classifiedRaster.shape[0], desc="Calculating IKDL matrixes", unit=" rows"
+):
     for col in range(0, classifiedRaster.shape[1]):
         if lCells[row, col]:
             for i in range(0, 8):
@@ -78,5 +80,12 @@ for i in range(0, 6):
                 sumMatrix[i] += IKDLRes[row, col, :, :]
     sumMatrix[i] /= cellCount
 
-
-input("plz wait b0S$")
+for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
+    for k in range(0, 8):
+        fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
+        ax.set_title("Plot for l={} and k={}".format(l + 1, k + 1))
+        ax.set_xlabel("Distance in pixels")
+        ax.set_ylabel("Average Enrichment Factor")
+        ax.plot(range(1, 9), sumMatrix[l, k, :])
+        fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
+        plt.close(fig)
