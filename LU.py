@@ -2,8 +2,12 @@ import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from tqdm import trange
+import os
 import PIL
 import csv
+
+cls = lambda: os.system("cls")
+cls()
 
 RgbCodes = dict()
 RgbCodes[0] = np.array([255, 255, 255])
