@@ -61,4 +61,6 @@ for row in range(0, classifiedRaster.shape[0]):
                     kCount = np.count_nonzero(maskedRaster == k + 1)
                     dTotal = np.count_nonzero(mask == 1)
                     KDAvg = kCount / dTotal
-                    KLDRes[i, k, classifiedRaster[row, col] - 1] = KDAvg
+                    KLDRes[i, k, classifiedRaster[row, col] - 1] = (
+                        KDAvg / KAvgTotal[classifiedRaster[row, col] - 1]
+                    )
