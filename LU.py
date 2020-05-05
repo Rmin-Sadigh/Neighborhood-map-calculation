@@ -43,3 +43,10 @@ for row in range(0, classifiedRaster.shape[0]):
                 max(0, row - i - 1) : min(row + i + 2, classifiedRaster.shape[0]),
                 max(0, col - i - 1) : min(col + i + 2, classifiedRaster.shape[1]),
             ]
+            mask = rangeMatrix[
+                i,
+                max(8 - row, 8 - i - 1) : 9
+                + min(i + 1, classifiedRaster.shape[0] - row),
+                max(8 - col, 8 - i - 1) : 9
+                + min(i + 1, classifiedRaster.shape[1] - col),
+            ]
