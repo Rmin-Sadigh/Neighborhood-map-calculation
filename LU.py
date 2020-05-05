@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from tqdm import trange
 import PIL
 import csv
 
@@ -17,7 +18,7 @@ imgRaster = np.asarray(img)
 classifiedRaster = np.tile(0, (img.height, img.width))
 img.close()
 
-for row in range(0, imgRaster.shape[0]):
+for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image"):
     for col in range(0, imgRaster.shape[1]):
         for id, color in RgbCodes.items():
             if np.array_equal(imgRaster[row][col], color):
@@ -39,7 +40,7 @@ for i in range(0, 8):
 
 IKDLRes = np.zeros((classifiedRaster.shape[0], classifiedRaster.shape[1], 8, 8))
 lCells = classifiedRaster != 0
-for row in range(0, classifiedRaster.shape[0]):
+for row in trange(0, classifiedRaster.shape[0], desc="Calculating IKDL matrixes"):
     for col in range(0, classifiedRaster.shape[1]):
         if lCells[row, col]:
             for i in range(0, 8):
@@ -61,7 +62,18 @@ for row in range(0, classifiedRaster.shape[0]):
                     kCount = np.count_nonzero(maskedRaster == k + 1)
                     dTotal = np.count_nonzero(mask == 1)
                     KDAvg = kCount / dTotal
-                    IKDLRes[row, col, k, i] = KDAvg
+                    IKDLRes[row, col, k, i] = KDAvg / KAvgTotal[k]
+
+sumMatrix = np.zeros([6, 8, 8])
+for i in range(0, 6):
+    cellPos = classifiedRaster == i + 1
+    cellCount = 0
+    for row in range(0, classifiedRaster.shape[0]):
+        for col in range(0, classifiedRaster.shape[1]):
+            if cellPos[row, col]:
+                cellCount += 1
+                sumMatrix[i] += IKDLRes[row, col, :, :]
+    sumMatrix[i] /= cellCount
 
 
 input("plz wait b0S$")
