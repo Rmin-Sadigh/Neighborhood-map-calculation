@@ -15,6 +15,7 @@ csvfile.close()
 img = PIL.Image.open("data/UL_Crop.png")
 imgRaster = np.asarray(img)
 classifiedRaster = np.tile(0, (img.height, img.width))
+img.close()
 
 for row in range(0, imgRaster.shape[0]):
     for col in range(0, imgRaster.shape[1]):
@@ -36,8 +37,7 @@ KAvgTotal = np.empty([8])
 for i in range(0, 8):
     KAvgTotal[i] = np.count_nonzero(classifiedRaster == i + 1) / classifiedRaster.size
 
-KLDRes = np.zeros((8, 8, 8))
-
+IKDLRes = np.zeros((classifiedRaster.shape[0], classifiedRaster.shape[1], 8, 8))
 lCells = classifiedRaster != 0
 for row in range(0, classifiedRaster.shape[0]):
     for col in range(0, classifiedRaster.shape[1]):
@@ -61,6 +61,7 @@ for row in range(0, classifiedRaster.shape[0]):
                     kCount = np.count_nonzero(maskedRaster == k + 1)
                     dTotal = np.count_nonzero(mask == 1)
                     KDAvg = kCount / dTotal
-                    KLDRes[i, k, classifiedRaster[row, col] - 1] = (
-                        KDAvg / KAvgTotal[classifiedRaster[row, col] - 1]
-                    )
+                    IKDLRes[row, col, k, i] = KDAvg
+
+
+input("plz wait b0S$")
