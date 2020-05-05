@@ -36,18 +36,29 @@ KAvgTotal = np.empty([8])
 for i in range(0, 8):
     KAvgTotal[i] = np.count_nonzero(classifiedRaster == i + 1) / classifiedRaster.size
 
+KLDRes = np.zeros((8, 8, 8))
+
+lCells = classifiedRaster != 0
 for row in range(0, classifiedRaster.shape[0]):
     for col in range(0, classifiedRaster.shape[1]):
-        for i in range(0, 8):
-            baseImg = classifiedRaster[
-                max(0, row - i - 1) : 1 + min(row + i + 1, classifiedRaster.shape[0]),
-                max(0, col - i - 1) : 1 + min(col + i + 1, classifiedRaster.shape[1]),
-            ]
-            mask = rangeMatrix[
-                i,
-                max(8 - row, 8 - i - 1) : 9
-                + min(i + 1, classifiedRaster.shape[0] - row - 1),
-                max(8 - col, 8 - i - 1) : 9
-                + min(i + 1, classifiedRaster.shape[1] - col - 1),
-            ]
-            maskedRaster = np.multiply(baseImg, mask)
+        if lCells[row, col]:
+            for i in range(0, 8):
+                baseImg = classifiedRaster[
+                    max(0, row - i - 1) : 1
+                    + min(row + i + 1, classifiedRaster.shape[0]),
+                    max(0, col - i - 1) : 1
+                    + min(col + i + 1, classifiedRaster.shape[1]),
+                ]
+                mask = rangeMatrix[
+                    i,
+                    max(8 - row, 8 - i - 1) : 9
+                    + min(i + 1, classifiedRaster.shape[0] - row - 1),
+                    max(8 - col, 8 - i - 1) : 9
+                    + min(i + 1, classifiedRaster.shape[1] - col - 1),
+                ]
+                maskedRaster = np.multiply(baseImg, mask)
+                for k in range(0, 8):
+                    kCount = np.count_nonzero(maskedRaster == k + 1)
+                    dTotal = np.count_nonzero(mask == 1)
+                    KDAvg = kCount / dTotal
+                    KLDRes[i, k, classifiedRaster[row, col] - 1] = KDAvg
