@@ -6,8 +6,7 @@ import os
 import PIL
 import csv
 
-cls = lambda: os.system("cls")
-cls()
+os.system("cls")
 
 RgbCodes = dict()
 RgbCodes[0] = np.array([255, 255, 255])
