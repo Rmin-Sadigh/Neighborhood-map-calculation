@@ -31,3 +31,15 @@ for i in range(0, 8):
     rangeMatrix[i, 8 + i + 1, 8 - i - 1 : 8 + i + 2] = 1
     rangeMatrix[i, 8 - i - 1 : 8 + i + 2, 8 - i - 1] = 1
     rangeMatrix[i, 8 - i - 1 : 8 + i + 2, 8 + i + 1] = 1
+
+KAvgTotal = np.empty([8])
+for i in range(0, 8):
+    KAvgTotal[i] = np.count_nonzero(classifiedRaster == i + 1) / classifiedRaster.size
+
+for row in range(0, classifiedRaster.shape[0]):
+    for col in range(0, classifiedRaster.shape[1]):
+        for i in range(0, 8):
+            baseImg = classifiedRaster[
+                max(0, row - i - 1) : min(row + i + 2, classifiedRaster.shape[0]),
+                max(0, col - i - 1) : min(col + i + 2, classifiedRaster.shape[1]),
+            ]
