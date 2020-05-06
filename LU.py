@@ -19,7 +19,7 @@ csvfile.close()
 # ─── IMPORT IMAGE ───────────────────────────────────────────────────────────────
 img = PIL.Image.open("data/UL_Crop.png")
 imgRaster = np.asarray(img)
-classifiedRaster = np.tile(0, (img.height, img.width))
+classifiedRaster = np.zeros((img.height, img.width), dtype=np.int8)
 img.close()
 # ─── CLASSIFYING THE IMAGE ──────────────────────────────────────────────────────
 for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image", unit=" rows"):
@@ -29,7 +29,7 @@ for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image", unit=" 
                 classifiedRaster[row][col] = id
                 break
 # ─── CREATING RANGE MATRIX TEMPLATE ─────────────────────────────────────────────
-rangeMatrix = np.tile(0, (8, 17, 17))
+rangeMatrix = np.zeros((8, 17, 17), dtype=np.int8)
 for d in range(0, 8):
     rangeMatrix[d, 8 - d - 1, 8 - d - 1 : 8 + d + 2] = 1
     rangeMatrix[d, 8 + d + 1, 8 - d - 1 : 8 + d + 2] = 1
@@ -40,7 +40,9 @@ KAvgTotal = np.empty([8])
 for k in range(0, 8):
     KAvgTotal[k] = np.count_nonzero(classifiedRaster == k + 1) / classifiedRaster.size
 # ─── CALCULATING KD FOR EACH CELL ──────────────────────────────────────────────
-IKDLRes = np.zeros((classifiedRaster.shape[0], classifiedRaster.shape[1], 8, 8))
+IKDLRes = np.zeros(
+    (classifiedRaster.shape[0], classifiedRaster.shape[1], 8, 8), dtype=np.float32
+)
 lCells = classifiedRaster != 0
 for row in trange(
     0, classifiedRaster.shape[0], desc="Calculating IKDL matrixes", unit=" rows"
@@ -68,7 +70,7 @@ for row in trange(
                     KDAvg = kCount / dTotal
                     IKDLRes[row, col, k, d] = KDAvg / KAvgTotal[k]
 # ─── CALCULATING AVERAGE EF FOR EACH L PER K ────────────────────────────────────
-sumMatrix = np.zeros([6, 8, 8])
+sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 for l in range(0, 6):
     cellPos = classifiedRaster == l + 1
     cellCount = 0
