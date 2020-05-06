@@ -84,10 +84,12 @@ if not os.path.exists("data/outputs"):
 for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
     for k in range(0, 8):
         fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
+        ax.plot(range(1, 9), sumMatrix[l, k, :])
         ax.set_title("Plot for l={} and k={}".format(l + 1, k + 1))
         ax.set_xlabel("Distance in pixels")
         ax.set_ylabel("Average Enrichment Factor")
-        ax.plot(range(1, 9), sumMatrix[l, k, :])
+        for i, txt in enumerate(sumMatrix[l, k, :]):
+            ax.annotate(np.round(txt, 4), (i + 1, sumMatrix[l, k, i]))
         fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
         plt.close(fig)
 
