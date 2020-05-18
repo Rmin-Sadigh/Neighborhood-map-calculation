@@ -78,7 +78,7 @@ for l in range(0, 6):
         for col in range(0, classifiedRaster.shape[1]):
             if cellPos[row, col]:
                 cellCount += 1
-                sumMatrix[l] += IKDLRes[row, col, :, :]
+                sumMatrix[l] += IKDLRes[row, col]
     sumMatrix[l] /= cellCount
 # ─── PLOTTING KD FOR EACH L ─────────────────────────────────────────────────────
 if not os.path.exists("data/outputs"):
@@ -86,11 +86,11 @@ if not os.path.exists("data/outputs"):
 for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
     for k in range(0, 8):
         fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
-        ax.plot(range(1, 9), sumMatrix[l, k, :])
+        ax.plot(range(1, 9), sumMatrix[l, k])
         ax.set_title("Plot for L={} and K={}".format(l + 1, k + 1))
         ax.set_xlabel("Distance in pixels (d)")
         ax.set_ylabel(r"Average Enrichment Factor ($\overline{EF}$)")
-        for i, txt in enumerate(sumMatrix[l, k, :]):
+        for i, txt in enumerate(sumMatrix[l, k]):
             ax.annotate(np.round(txt, 4), (i + 1, sumMatrix[l, k, i]))
         fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
         plt.close(fig)
