@@ -64,35 +64,32 @@ for row in trange(
                     + min(d + 1, classifiedRaster.shape[1] - col - 1),
                 ]
                 maskedRaster = np.multiply(baseImg, mask)
+                dTotal = np.count_nonzero(mask == 1)
                 for k in range(0, 8):
                     kCount = np.count_nonzero(maskedRaster == k + 1)
-                    dTotal = np.count_nonzero(mask == 1)
                     KDAvg = kCount / dTotal
                     IKDLRes[row, col, k, d] = KDAvg / KAvgTotal[k]
 # ─── CALCULATING AVERAGE EF FOR EACH L PER K ────────────────────────────────────
 sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
+for row in range(0, classifiedRaster.shape[0]):
+    for col in range(0, classifiedRaster.shape[1]):
+        sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
 for l in range(0, 6):
-    cellPos = classifiedRaster == l + 1
-    cellCount = 0
-    for row in range(0, classifiedRaster.shape[0]):
-        for col in range(0, classifiedRaster.shape[1]):
-            if cellPos[row, col]:
-                cellCount += 1
-                sumMatrix[l] += IKDLRes[row, col]
-    sumMatrix[l] /= cellCount
+    sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
 # ─── PLOTTING KD FOR EACH L ─────────────────────────────────────────────────────
 if not os.path.exists("data/outputs"):
     os.makedirs("data/outputs")
+fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
+ax.set_xlabel("Distance in pixels (d)")
+ax.set_ylabel(r"Average Enrichment Factor ($\overline{EF}$)")
 for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
     for k in range(0, 8):
-        fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
         ax.plot(range(1, 9), sumMatrix[l, k])
         ax.set_title("Plot for L={} and K={}".format(l + 1, k + 1))
-        ax.set_xlabel("Distance in pixels (d)")
-        ax.set_ylabel(r"Average Enrichment Factor ($\overline{EF}$)")
         for i, txt in enumerate(sumMatrix[l, k]):
             ax.annotate(np.round(txt, 4), (i + 1, sumMatrix[l, k, i]))
         fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
-        plt.close(fig)
-
+        ax.clear()
+plt.close(fig)
+# ─── FINAL MESSAGE ──────────────────────────────────────────────────────────────
 print("Output figures are saved in data/outputs directory")
