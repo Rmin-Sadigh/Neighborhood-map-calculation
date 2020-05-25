@@ -78,6 +78,7 @@ for row in range(0, classifiedRaster.shape[0]):
 for l in range(0, 6):
     sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
 # ─── PLOTTING KD FOR EACH L ─────────────────────────────────────────────────────
+weightMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 if not os.path.exists("data/outputs"):
     os.makedirs("data/outputs")
 fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
@@ -92,6 +93,9 @@ for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
                 r"Log of Average Enrichment Factor ($\log_2 {\overline{EF}}$)"
             )
             data[1] = np.log(data[1]) / np.log(2)
+            for (i, v) in enumerate(data[1]):
+                if v != 0:
+                    weightMatrix[l, k, int(data[0, i]) - 1] = v
             ax.plot(data[0], data[1])
             ax.set_title("Plot for L={} and K={}".format(l + 1, k + 1))
             for i, txt in enumerate(data[1]):
