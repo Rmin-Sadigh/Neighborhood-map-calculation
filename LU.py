@@ -103,5 +103,53 @@ for l in trange(6, desc="Printing plots", unit=" Plot"):
             fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
             ax.clear()
 plt.close(fig)
+# ─── NEIGHBORHOOD MAP ───────────────────────────────────────────────────────────
+nbhRaster = np.zeros((img.height, img.width), dtype=np.float32)
+for l in range(6):
+    nbhRaster.fill(0)
+    lCells = classifiedRaster == l + 1
+    for row in trange(
+        nbhRaster.shape[0],
+        desc="Calculating Neighborhood Map for landuse {}".format(l + 1),
+        unit=" Row",
+    ):
+        for col in range(nbhRaster.shape[1]):
+            if lCells[row, col]:
+                for d in range(8):
+                    baseImg = classifiedRaster[
+                        max(0, row - d - 1) : 1
+                        + min(row + d + 1, classifiedRaster.shape[0]),
+                        max(0, col - d - 1) : 1
+                        + min(col + d + 1, classifiedRaster.shape[1]),
+                    ]
+                    mask = rangeMatrix[
+                        d,
+                        max(8 - row, 8 - d - 1) : 9
+                        + min(d + 1, classifiedRaster.shape[0] - row - 1),
+                        max(8 - col, 8 - d - 1) : 9
+                        + min(d + 1, classifiedRaster.shape[1] - col - 1),
+                    ]
+                    maskedRaster = np.multiply(baseImg, mask)
+                    for k in range(8):
+                        kCount = np.count_nonzero(maskedRaster == k + 1)
+                        nbhRaster[row, col] += kCount * weightMatrix[l, k, d]
+    # ─── IMAGE NORMALZATION ─────────────────────────────────────────────────────────
+    a = (np.max(nbhRaster) - np.min(nbhRaster)) / 0.8
+    b = a / 10 - np.min(nbhRaster)
+    for row in trange(
+        nbhRaster.shape[0],
+        desc="Normalizing Neighborhood Map for landuse {}".format(l + 1),
+        unit=" Row",
+    ):
+        for col in range(nbhRaster.shape[1]):
+            nbhRaster[row, col] = min(max(0, (nbhRaster[row, col] + b) / a), 1)
+    # ─── PLOTTING MAGE ──────────────────────────────────────────────────────────────
+    fig, ax = plt.subplots(nrows=1, ncols=1, dpi=300)
+    ax.set_title("Neighborhood map for L={}".format(l + 1))
+    img = ax.imshow(nbhRaster)
+    cbar = ax.figure.colorbar(ax.imshow(nbhRaster))
+    plt.axis("off")
+    fig.savefig("data/outputs/N-map#{}".format(l + 1))
+    plt.close(fig)
 # ─── FINAL MESSAGE ──────────────────────────────────────────────────────────────
 print("Output figures are saved in data/outputs directory")
