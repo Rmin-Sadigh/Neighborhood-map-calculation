@@ -73,23 +73,31 @@ for row in trange(
 sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 for row in range(0, classifiedRaster.shape[0]):
     for col in range(0, classifiedRaster.shape[1]):
-        sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
+        if classifiedRaster[row, col] <= 6:
+            sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
 for l in range(0, 6):
     sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
 # ─── PLOTTING KD FOR EACH L ─────────────────────────────────────────────────────
 if not os.path.exists("data/outputs"):
     os.makedirs("data/outputs")
 fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
-ax.set_xlabel("Distance in pixels (d)")
-ax.set_ylabel(r"Average Enrichment Factor ($\overline{EF}$)")
 for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
     for k in range(0, 8):
-        ax.plot(range(1, 9), sumMatrix[l, k])
-        ax.set_title("Plot for L={} and K={}".format(l + 1, k + 1))
-        for i, txt in enumerate(sumMatrix[l, k]):
-            ax.annotate(np.round(txt, 4), (i + 1, sumMatrix[l, k, i]))
-        fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
-        ax.clear()
+        data = np.vstack((range(1, 9), sumMatrix[l, k]))
+        zeroValues = [i for (i, v) in enumerate(data[1]) if v == 0]
+        data = np.delete(data, zeroValues, 1)
+        if data.shape[1] != 0:
+            ax.set_xlabel("Distance in pixels (d)")
+            ax.set_ylabel(
+                r"Log of Average Enrichment Factor ($\log_2 {\overline{EF}}$)"
+            )
+            data[1] = np.log(data[1]) / np.log(2)
+            ax.plot(data[0], data[1])
+            ax.set_title("Plot for L={} and K={}".format(l + 1, k + 1))
+            for i, txt in enumerate(data[1]):
+                ax.annotate(np.round(txt, 4), (data[0, i], data[1, i]))
+            fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
+            ax.clear()
 plt.close(fig)
 # ─── FINAL MESSAGE ──────────────────────────────────────────────────────────────
 print("Output figures are saved in data/outputs directory")
