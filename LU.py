@@ -108,6 +108,7 @@ nbhRaster = np.zeros((img.height, img.width), dtype=np.float32)
 for l in range(6):
     nbhRaster.fill(0)
     lCells = classifiedRaster == l + 1
+    # ─── MAP CALCULATION ────────────────────────────────────────────────────────────
     for row in trange(
         nbhRaster.shape[0],
         desc="Calculating Neighborhood Map for landuse {}".format(l + 1),
@@ -133,7 +134,7 @@ for l in range(6):
                     for k in range(8):
                         kCount = np.count_nonzero(maskedRaster == k + 1)
                         nbhRaster[row, col] += kCount * weightMatrix[l, k, d]
-    # ─── IMAGE NORMALZATION ─────────────────────────────────────────────────────────
+    # ─── MAP NORMALZATION ───────────────────────────────────────────────────────────
     a = (np.max(nbhRaster) - np.min(nbhRaster)) / 0.8
     b = a / 10 - np.min(nbhRaster)
     for row in trange(
@@ -143,7 +144,7 @@ for l in range(6):
     ):
         for col in range(nbhRaster.shape[1]):
             nbhRaster[row, col] = min(max(0, (nbhRaster[row, col] + b) / a), 1)
-    # ─── PLOTTING MAGE ──────────────────────────────────────────────────────────────
+    # ─── PLOTTING MAP ──────────────────────────────────────────────────────────────
     fig, ax = plt.subplots(nrows=1, ncols=1, dpi=300)
     ax.set_title("Neighborhood map for L={}".format(l + 1))
     img = ax.imshow(nbhRaster)
