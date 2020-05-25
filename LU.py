@@ -22,22 +22,22 @@ imgRaster = np.asarray(img)
 classifiedRaster = np.zeros((img.height, img.width), dtype=np.int8)
 img.close()
 # ─── CLASSIFYING THE IMAGE ──────────────────────────────────────────────────────
-for row in trange(0, imgRaster.shape[0], desc="Reclassifying the image", unit=" rows"):
-    for col in range(0, imgRaster.shape[1]):
+for row in trange(imgRaster.shape[0], desc="Reclassifying the image", unit=" rows"):
+    for col in range(imgRaster.shape[1]):
         for id, color in RgbCodes.items():
             if np.array_equal(imgRaster[row][col], color):
                 classifiedRaster[row][col] = id
                 break
 # ─── CREATING RANGE MATRIX TEMPLATE ─────────────────────────────────────────────
 rangeMatrix = np.zeros((8, 17, 17), dtype=np.int8)
-for d in range(0, 8):
+for d in range(8):
     rangeMatrix[d, 8 - d - 1, 8 - d - 1 : 8 + d + 2] = 1
     rangeMatrix[d, 8 + d + 1, 8 - d - 1 : 8 + d + 2] = 1
     rangeMatrix[d, 8 - d - 1 : 8 + d + 2, 8 - d - 1] = 1
     rangeMatrix[d, 8 - d - 1 : 8 + d + 2, 8 + d + 1] = 1
 # ─── CALCULATING AVERAGE LANDUSE COVER ──────────────────────────────────────────
 KAvgTotal = np.empty([8])
-for k in range(0, 8):
+for k in range(8):
     KAvgTotal[k] = np.count_nonzero(classifiedRaster == k + 1) / classifiedRaster.size
 # ─── CALCULATING KD FOR EACH CELL ──────────────────────────────────────────────
 IKDLRes = np.zeros(
@@ -45,11 +45,11 @@ IKDLRes = np.zeros(
 )
 lCells = classifiedRaster != 0
 for row in trange(
-    0, classifiedRaster.shape[0], desc="Calculating IKDL matrixes", unit=" rows"
+    classifiedRaster.shape[0], desc="Calculating IKDL matrixes", unit=" rows"
 ):
-    for col in range(0, classifiedRaster.shape[1]):
+    for col in range(classifiedRaster.shape[1]):
         if lCells[row, col]:
-            for d in range(0, 8):
+            for d in range(8):
                 baseImg = classifiedRaster[
                     max(0, row - d - 1) : 1
                     + min(row + d + 1, classifiedRaster.shape[0]),
@@ -65,25 +65,25 @@ for row in trange(
                 ]
                 maskedRaster = np.multiply(baseImg, mask)
                 dTotal = np.count_nonzero(mask == 1)
-                for k in range(0, 8):
+                for k in range(8):
                     kCount = np.count_nonzero(maskedRaster == k + 1)
                     KDAvg = kCount / dTotal
                     IKDLRes[row, col, k, d] = KDAvg / KAvgTotal[k]
 # ─── CALCULATING AVERAGE EF FOR EACH L PER K ────────────────────────────────────
 sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
-for row in range(0, classifiedRaster.shape[0]):
-    for col in range(0, classifiedRaster.shape[1]):
+for row in range(classifiedRaster.shape[0]):
+    for col in range(classifiedRaster.shape[1]):
         if classifiedRaster[row, col] <= 6:
             sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
-for l in range(0, 6):
+for l in range(6):
     sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
 # ─── PLOTTING KD FOR EACH L ─────────────────────────────────────────────────────
 weightMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 if not os.path.exists("data/outputs"):
     os.makedirs("data/outputs")
 fig, ax = plt.subplots(nrows=1, ncols=1, dpi=150)
-for l in trange(0, 6, desc="Printing plots", unit=" Plot"):
-    for k in range(0, 8):
+for l in trange(6, desc="Printing plots", unit=" Plot"):
+    for k in range(8):
         data = np.vstack((range(1, 9), sumMatrix[l, k]))
         zeroValues = [i for (i, v) in enumerate(data[1]) if v == 0]
         data = np.delete(data, zeroValues, 1)
