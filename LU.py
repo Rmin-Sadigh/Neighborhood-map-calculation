@@ -8,6 +8,13 @@ import csv
 
 # ─── CLEAN CONSOLE ──────────────────────────────────────────────────────────────
 os.system("cls")
+
+#
+# ────────────────────────────────────────────────────────────────────── I ──────────
+#   :::::: R E C L A S S I F I C A T I O N :  :   :    :     :        :          :
+# ────────────────────────────────────────────────────────────────────────────────
+#
+
 # ─── IMPORT LANDUSE COLORS ──────────────────────────────────────────────────────
 RgbCodes = dict()
 RgbCodes[0] = np.array([255, 255, 255])
@@ -28,6 +35,13 @@ for row in trange(imgRaster.shape[0], desc="Reclassifying the image", unit=" row
             if np.array_equal(imgRaster[row][col], color):
                 classifiedRaster[row][col] = id
                 break
+
+#
+# ────────────────────────────────────────────────────────────────────────────── II ──────────
+#   :::::: P A R T   - A -   O F   P R O J E C T : :  :   :    :     :        :          :
+# ────────────────────────────────────────────────────────────────────────────────────────
+#
+
 # ─── CREATING RANGE MATRIX TEMPLATE ─────────────────────────────────────────────
 rangeMatrix = np.zeros((8, 17, 17), dtype=np.int8)
 for d in range(8):
@@ -103,6 +117,13 @@ for l in trange(6, desc="Printing plots", unit=" Plot"):
             fig.savefig("data/outputs/fig#{}{}.png".format(l + 1, k + 1))
             ax.clear()
 plt.close(fig)
+
+#
+# ────────────────────────────────────────────────────────────────────────────── III ──────────
+#   :::::: P A R T   - B -   O F   P R O J E C T : :  :   :    :     :        :          :
+# ────────────────────────────────────────────────────────────────────────────────────────
+#
+
 # ─── NEIGHBORHOOD MAP ───────────────────────────────────────────────────────────
 nbhRaster = np.zeros((img.height, img.width), dtype=np.float32)
 for l in range(6):
