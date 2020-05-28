@@ -87,7 +87,7 @@ for row in trange(
 sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 for row in range(classifiedRaster.shape[0]):
     for col in range(classifiedRaster.shape[1]):
-        if classifiedRaster[row, col] <= 6:
+        if classifiedRaster[row, col] in range(1,7):
             sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
 for l in range(6):
     sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
