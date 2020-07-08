@@ -1,7 +1,7 @@
 # ─── LIBRARIES ──────────────────────────────────────────────────────────────────
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm import trange
+from tqdm import trange, tqdm
 import os
 import PIL
 import csv
@@ -29,12 +29,11 @@ imgRaster = np.asarray(img)
 classifiedRaster = np.zeros((img.height, img.width), dtype=np.int8)
 img.close()
 # ─── CLASSIFYING THE IMAGE ──────────────────────────────────────────────────────
-for row in trange(imgRaster.shape[0], desc="Reclassifying the image", unit=" rows"):
-    for col in range(imgRaster.shape[1]):
-        for id, color in RgbCodes.items():
-            if np.array_equal(imgRaster[row][col], color):
-                classifiedRaster[row][col] = id
-                break
+classes = tqdm(RgbCodes.keys())
+classes.set_description("Reclassifying image")
+for id in classes:
+    color = RgbCodes[id]
+    classifiedRaster += (np.prod(np.equal(imgRaster, color), 2)).astype(int) * id
 
 #
 # ────────────────────────────────────────────────────────────────────────────── II ──────────
@@ -87,7 +86,7 @@ for row in trange(
 sumMatrix = np.zeros([6, 8, 8], dtype=np.float64)
 for row in range(classifiedRaster.shape[0]):
     for col in range(classifiedRaster.shape[1]):
-        if classifiedRaster[row, col] in range(1,7):
+        if classifiedRaster[row, col] in range(1, 7):
             sumMatrix[classifiedRaster[row, col] - 1] += IKDLRes[row, col]
 for l in range(6):
     sumMatrix[l] /= np.count_nonzero(classifiedRaster == l + 1)
