@@ -29,11 +29,9 @@ imgRaster = np.asarray(img)
 classifiedRaster = np.zeros((img.height, img.width), dtype=np.int8)
 img.close()
 # ─── CLASSIFYING THE IMAGE ──────────────────────────────────────────────────────
-classes = tqdm(RgbCodes.keys())
-classes.set_description("Reclassifying image")
+classes = tqdm(RgbCodes.keys(), desc="Reclassifying image", unit=" classes")
 for id in classes:
-    color = RgbCodes[id]
-    classifiedRaster += (np.prod(np.equal(imgRaster, color), 2)).astype(int) * id
+    classifiedRaster += (np.prod(np.equal(imgRaster, RgbCodes[id]), 2)).astype(int) * id
 
 #
 # ────────────────────────────────────────────────────────────────────────────── II ──────────
