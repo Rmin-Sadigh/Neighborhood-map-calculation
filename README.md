@@ -23,7 +23,7 @@ Besides the notes and comments in the code, here is some info about the code and
   - A landuse map (imported as `img` in the code)
   - A txt or csv file containing the codes and RGB colors of different landuses in the map (imported as `csvfile` in the code)
 - The neighborhood size of the transition functions (distance) will be between 1 and 8 pixels, creating masks between 3x3 and 17x17 pixels. The mask will be cropped if any part of it falls out of the boundaries of the base landuse image and the values will be calculated with the cropped mask.
-- Since we will be calculating $log$ of the enrichment factors to create the transition functions, we will skip calculating logarithm of possible 0 values to prevent infinite values in our transition function.
+- Since we will be calculating logarithm of the enrichment factors to create the transition functions, we will skip calculating logarithm of possible 0 values to prevent infinite values in our transition function.
 - The output (which consists of multiple transition function figures and Neighborhood maps) will be placed in a folder named `outputs` in the `data` folder.
   - Transition function figures will be named `fig#XY` where:
     - **X** will be the landuse being affected
